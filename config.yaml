@@ -1,0 +1,10 @@
+#This is configuration file for Binance Sniper Bot
+binance:
+  rest-api-link: 'https://api.binance.com'
+  web-socket-link: 'wss://ws-api.binance.com:443/ws-api/v3'
+  api-key: 'YOUR_BINANCE_API_KEY'
+  api-sec: 'YOUR_BINANCE_API_SECRET'
+strategy:
+  order_type: 'OCO' #OCO or LIMIT
+  take_profit: 0.05 #Take profit in percent
+  stop_loss: 0.10 #Stop loss in percent
