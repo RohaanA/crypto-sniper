@@ -1,7 +1,12 @@
 from utils import *
 import websocket
 import json 
-from binance.spot import Spot 
+import time
+import logging
+import os
+from binance.lib.utils import config_logging
+from binance.websocket.spot.websocket_stream import SpotWebsocketStreamClient
+
 def connect_to_websocket(details):
     # Connects to the websocket and returns the connection
     print(details)
@@ -17,23 +22,35 @@ def on_message(ws, message):
         coin_name = data['coin']
         print(f"New coin launch: {coin_name}")
 
+def message_handler(_, message):
+    # Write message to log file
+    with open("log.txt", "a") as f:
+        f.write(message)
+    print(message)
+
 def main():
-    client = Spot()
-    print(client.time())
+    # client = Spot()
+    # print(client.time())
+    my_client = SpotWebsocketStreamClient(on_message=message_handler)
     
+    # subscribe to all symbols ticker stream
+    my_client.ticker()
+    
+    
+    time.sleep(5)
+
+    # unsubscribe
+    my_client.ticker(action=SpotWebsocketStreamClient.ACTION_UNSUBSCRIBE)
+    
+    logging.debug("closing ws connection")
+    my_client.stop()
     
     # print(client.klines("BTCUSDT", "1m"))
-    client = Spot(api_key='REDACTED_BINANCE_API_KEY', api_secret='REDACTED_BINANCE_API_SECRET')
+    # client = Spot(api_key=os.environ["BINANCE_API_KEY"], api_secret=os.environ["BINANCE_API_SECRET"])
     # Get account and balance information
-    print(client.account())
+    # print(client.account())
     exit()
-    chosen_exchange = "binance"
-    print("Fetching configuration details from config.yaml")
-    details = fetch_details(chosen_exchange)
-    print(details)
-    print("Connecting to the binance web socket")
-    ws = connect_to_websocket(details)
-    pass
+
 
 if __name__ == '__main__':
     print('Starting bot....')
